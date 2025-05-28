@@ -1,4 +1,4 @@
-package org.web.models.requests;
+package simple.web.models.requests;
 
 public class GetModel extends HTTPRequest {
 

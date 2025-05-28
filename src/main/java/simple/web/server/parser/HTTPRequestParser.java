@@ -1,7 +1,7 @@
-package org.web.parser;
+package simple.web.parser;
 
 import lombok.extern.slf4j.Slf4j;
-import org.web.models.requests.HTTPRequest;
+import simple.web.models.requests.HTTPRequest;
 
 import java.io.BufferedReader;
 import java.io.IOException;

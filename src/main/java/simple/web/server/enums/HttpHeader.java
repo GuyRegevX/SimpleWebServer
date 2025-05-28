@@ -1,4 +1,4 @@
-package org.web.enums;
+package simple.web.enums;
 
 import lombok.Getter;
 

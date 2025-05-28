@@ -1,4 +1,4 @@
-package org.web;
+package simple.web;
 
 import java.io.BufferedReader;
 import java.io.IOException;
