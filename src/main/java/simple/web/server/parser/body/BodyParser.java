@@ -1,6 +1,6 @@
-package simple.web.parser.body;
+package simple.web.server.parser.body;
 
-import simple.web.enums.HttpHeader;
+import simple.web.server.enums.HttpHeader;
 
 import java.io.BufferedReader;
 import java.util.Map;

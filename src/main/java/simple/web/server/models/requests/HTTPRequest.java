@@ -1,8 +1,8 @@
-package simple.web.models.requests;
+package simple.web.server.models.requests;
 
 import lombok.Builder;
 import lombok.Data;
-import simple.web.enums.HttpMethod;
+import simple.web.server.enums.HttpMethod;
 
 import java.util.Map;
 

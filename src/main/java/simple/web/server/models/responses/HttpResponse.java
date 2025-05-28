@@ -1,4 +1,4 @@
-package simple.web.models.responses;
+package simple.web.server.models.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

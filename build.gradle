@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group = 'org.web'
+group = 'org.simple.web.server'
 version = '1.0-SNAPSHOT'
 
 repositories {

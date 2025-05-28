@@ -1,4 +1,4 @@
-package simple.web;
+package simple.web.server;
 
 import org.example.controller.AssetVulnerabilityController;
 
