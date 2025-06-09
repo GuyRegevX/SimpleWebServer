@@ -8,10 +8,10 @@ import java.util.Map;
 
 @Data
 @Builder
-public abstract class HTTPRequest {
+public class HTTPRequest {
     private HttpMethod method;
     private Map<String, String> headers;
     private String path;
-    private String query;
+    private Map<String, String> query;
     private String body;
 }

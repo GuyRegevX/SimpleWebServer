@@ -1,21 +1,38 @@
 package simple.web.server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import simple.web.server.enums.HttpStatusCode;
+import simple.web.server.hanlder.RequestHandler;
+import simple.web.server.models.responses.HttpWebResponse;
+import simple.web.server.request.HTTPRequestParserImpl;
+import simple.web.server.response.ResponseSender;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.concurrent.*;
 
 public class WebServer {
-    private static final int PORT = Const.SERVER_PORT;
+    private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
+
+    private static final int PORT = Const.Server.PORT;
     private boolean isRunning = true;
     private ServerSocket serverSocket;
-    private final ThreadPoolExecutor threadPool; // Limit concurrent threads
+    private final ThreadPoolExecutor threadPool;
+    private final ResponseSender responseSender;// Limit concurrent threads
+    private final HttpWebResponse serviceUnavailableResponse;
+    private final RequestHandler requestHandler;
 
-    public WebServer() {
+    public WebServer(ResponseSender responseSender, RequestHandler requestHandler) {
+        this.responseSender = responseSender;
+        this.requestHandler = requestHandler;
         int cores = Runtime.getRuntime().availableProcessors();
+        serviceUnavailableResponse = HttpWebResponse.builder().statusCode(HttpStatusCode.SERVER_UNAVAILABLE_ERROR).build();
         threadPool = new ThreadPoolExecutor(
                 cores,                // core threads
                 cores * 2,           // max threads
@@ -26,33 +43,29 @@ public class WebServer {
     }
 
     public void startup() {
-        try {
-            serverSocket = new ServerSocket(PORT);
-            System.out.println("Server started on port " + PORT);
-
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             while (isRunning) {
                 Socket clientSocket = serverSocket.accept();
-                threadPool.submit(() -> handleClient(clientSocket));
+                try {
+                    threadPool.submit(() -> handleClient(clientSocket));
+                } catch (RejectedExecutionException e) {
+                        logger.error("Server is overloaded - cannot accept new client connection");
+                        // Important: Clean up the socket to prevent resource leak
+                        try {
+                            responseSender.send(clientSocket, serviceUnavailableResponse);
+                        } catch (IOException closeError) {
+                            logger.error("Failed to close rejected client socket", closeError);
+                        }
+                    }
             }
-        } catch (IOException e) {
+        }catch (IOException e) {
             System.err.println("Server error: " + e.getMessage());
         }
     }
 
     private void handleClient(Socket clientSocket) {
-        try (clientSocket; BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
-            try {
-
-                // Read response
-                String response;
-                while ((response = in.readLine()) != null) {
-                    System.out.println(response);
-                }
-
-            } catch (IOException e) {
-                System.err.println("Error handling client: " + e.getMessage());
-            }
+      try{
+            requestHandler.handle(clientSocket);
         } catch (IOException e) {
             System.err.println("Error closing client socket: " + e.getMessage());
         }
@@ -71,6 +84,7 @@ public class WebServer {
 
 
     public void shutdown() {
+        //First, finish all the connection (they still use the sockets)
         if (threadPool != null) {
             threadPool.shutdown();
             try {
@@ -83,6 +97,14 @@ public class WebServer {
                 threadPool.shutdownNow();
                 Thread.currentThread().interrupt();
             }
+        }
+
+        try {
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+            }
+        } catch (IOException e) {
+            System.err.println("Error closing client socket on shutdown: " + e.getMessage());
         }
     }
 
