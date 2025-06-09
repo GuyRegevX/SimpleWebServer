@@ -11,7 +11,9 @@ public enum HttpStatusCode {
     ACCEPTED(202, "Accepted", "The request has been received but not yet completed"),
     BAD_REQUEST(400, "Bad Request", "The server cannot process the request due to client error"),
     NOT_FOUND(404, "Not Found", "The server cannot find the requested resource"),
-    INTERNAL_SERVER_ERROR(500, "Internal Server Error", "The server encountered an internal error");
+    INTERNAL_SERVER_ERROR(500, "Internal Server Error", "The server encountered an internal error"),
+    SERVER_UNAVAILABLE_ERROR(503, "Service Unavailable", "Service temporarily unavailable");
+
 
     private final int code;
     private final String statusMessage;

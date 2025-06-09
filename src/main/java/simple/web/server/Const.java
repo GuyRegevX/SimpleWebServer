@@ -1,9 +1,20 @@
 package simple.web.server;
 
-public class Const {
+public final class Const {
+    private Const() {} // Prevent instantiation
 
-    public static final String SERVER_NAME = "SimpleWebServer";
-    public static final String SERVER_VERSION = "1.0";
-    public static final int SERVER_PORT = 9090;
-    public static final int SERVER_MAX_THREADS = 10;
+    public static final class Server {
+
+        public static final int PORT = 8080;
+        public static final String HOST = "localhost";
+        public static final int TIMEOUT = 5000;
+    }
+
+    public static final class Html {
+        public static final String CONTENT_TYPE = "text/html";
+        public static final String CHARSET = "UTF-8";
+        public static final String DOCTYPE = "<!DOCTYPE html>";
+        public static final String LINE_ENDING = "\r\n";
+
+    }
 }
